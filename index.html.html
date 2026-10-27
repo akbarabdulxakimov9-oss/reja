@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Reja va bemorlar</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&display=swap">
+<style>
+:root{
+  --sky-top:#e4f4ff;--sky-bot:#b9e0f7;--card:#ffffff;--card-soft:#f2faff;--ink:#1f3a52;--muted:#5d7b94;
+  --accent:#3aa0e0;--accent-ink:#ffffff;--line:#cfe6f5;--lunch:#fff1c9;--lunch-ink:#7a5b10;--danger:#d64545;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --sky-top:#16314d;--sky-bot:#234f77;--card:#1f4264;--card-soft:#1a3a58;--ink:#e6f2fb;--muted:#9bb8d0;
+  --accent:#5db7f0;--accent-ink:#0f2438;--line:#2f5a80;--lunch:#4a4220;--lunch-ink:#f3dc8d;--danger:#ff8a8a}}
+:root[data-theme="dark"]{
+  --sky-top:#16314d;--sky-bot:#234f77;--card:#1f4264;--card-soft:#1a3a58;--ink:#e6f2fb;--muted:#9bb8d0;
+  --accent:#5db7f0;--accent-ink:#0f2438;--line:#2f5a80;--lunch:#4a4220;--lunch-ink:#f3dc8d;--danger:#ff8a8a}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{font-family:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);
+  background:linear-gradient(180deg,var(--sky-top),var(--sky-bot)) fixed;overflow-x:hidden}
+.cloud{position:fixed;left:-30%;background:#fff;opacity:.5;border-radius:999px;animation:drift linear infinite;pointer-events:none}
+.cloud::before,.cloud::after{content:"";position:absolute;background:inherit;border-radius:50%}
+.cloud::before{width:55%;height:160%;left:12%;top:-70%}.cloud::after{width:42%;height:130%;right:12%;top:-50%}
+.c1{top:8%;width:110px;height:30px;animation-duration:50s}.c2{top:20%;width:80px;height:22px;animation-duration:70s;animation-delay:-30s}
+@keyframes drift{to{transform:translateX(160vw)}}
+@media (prefers-reduced-motion:reduce){.cloud{animation:none;left:60%}}
+.wrap{position:relative;max-width:520px;margin:0 auto;padding:16px 14px calc(96px + env(safe-area-inset-bottom,0px))}
+h1{font-size:24px;font-weight:800;margin:6px 4px 10px}
+.bar{display:flex;align-items:center;gap:8px;margin:0 0 10px}
+.bar h1{flex:1;margin:0 4px}
+.ic{width:40px;height:40px;border:0;border-radius:12px;background:var(--card);color:var(--ink);font:800 20px "Nunito",sans-serif;cursor:pointer}
+.today{height:40px;padding:0 14px;border:0;border-radius:12px;background:var(--card);color:var(--ink);font:800 14px "Nunito",sans-serif;cursor:pointer}
+.tabs{display:flex;gap:6px;padding:2px 0 10px}
+.tab{flex:1;min-width:0;padding:8px 2px;border:0;border-radius:14px;background:var(--card);color:var(--ink);font:800 14px "Nunito",sans-serif;cursor:pointer;text-align:center}
+.tab small{display:block;font-weight:700;font-size:11px;color:var(--muted);margin-top:1px}
+.tab[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+.tab[aria-selected="true"] small{color:var(--accent-ink);opacity:.9}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.day-title{display:flex;justify-content:space-between;align-items:baseline;margin:6px 4px 10px;font-weight:800;font-size:18px}
+.day-title span{font-size:13px;font-weight:700;color:var(--muted)}
+.list{display:flex;flex-direction:column;gap:8px}
+.slot,.pat{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border:0;border-radius:16px;background:var(--card);color:var(--ink);text-align:left;font:inherit;cursor:pointer}
+.num{flex:0 0 34px;height:34px;border-radius:50%;background:var(--card-soft);border:2px solid var(--line);display:grid;place-items:center;font-weight:800;font-size:15px}
+.filled .num{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.info{flex:1;min-width:0;display:block}
+.info>span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.who{font-weight:800;font-size:16px}.who.empty{color:var(--muted);font-weight:700}
+.time{font-size:13px;font-weight:700;color:var(--muted)}
+.note{font-size:12px;color:var(--muted);font-weight:600}
+.badge{flex:0 0 auto;font-size:12px;font-weight:800;padding:4px 9px;border-radius:999px;background:var(--card-soft);border:2px solid var(--line)}
+.lunch{display:flex;justify-content:center;gap:10px;padding:10px;border-radius:16px;background:var(--lunch);color:var(--lunch-ink);font-weight:800;font-size:15px}
+.off,.emptybox{margin-top:10px;padding:34px 20px;border-radius:22px;background:var(--card);text-align:center}
+.off b,.emptybox b{display:block;font-size:20px;margin-bottom:6px}.off p,.emptybox p{margin:0;color:var(--muted);font-weight:600}
+.search{width:100%;margin:0 0 10px}
+.add{width:100%;margin:0 0 10px;padding:14px;border:0;border-radius:16px;background:var(--accent);color:var(--accent-ink);font:800 16px "Nunito",sans-serif;cursor:pointer}
+.nav{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;gap:10px;padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));background:var(--card);border-top:2px solid var(--line);z-index:4}
+.nav button{flex:1;max-width:240px;padding:12px;border:0;border-radius:14px;background:var(--card-soft);color:var(--ink);font:800 15px "Nunito",sans-serif;cursor:pointer}
+.nav button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+.scrim{position:fixed;inset:0;background:rgba(10,30,50,.45);display:none;align-items:flex-end;justify-content:center;z-index:6}
+.scrim.open{display:flex}
+.sheet{width:100%;max-width:520px;max-height:92vh;overflow-y:auto;background:var(--card);border-radius:24px 24px 0 0;padding:20px 16px calc(20px + env(safe-area-inset-bottom,0px))}
+.sheet h2{margin:0 0 2px;font-size:18px;font-weight:800}.sheet .time{margin-bottom:8px}
+label.l{display:block;font-weight:700;font-size:13px;margin:10px 2px 4px;color:var(--muted)}
+input[type=text],input[type=tel],input:not([type]){width:100%;padding:13px 14px;border-radius:14px;border:2px solid var(--line);background:var(--card-soft);color:var(--ink);font:600 16px "Nunito",sans-serif}
+.chk{display:flex;gap:10px;align-items:center;margin:14px 2px 0;font-weight:700;font-size:15px}
+.chk input{width:22px;height:22px;accent-color:var(--accent)}
+.hint{margin:4px 2px 0;font-size:13px;color:var(--muted);font-weight:600}
+.row{display:flex;gap:8px;margin-top:16px}
+.btn{flex:1;padding:14px;border:0;border-radius:14px;font:800 16px "Nunito",sans-serif;cursor:pointer}
+.save{background:var(--accent);color:var(--accent-ink)}.clear{background:var(--card-soft);color:var(--ink);border:2px solid var(--line)}
+.del{background:transparent;color:var(--danger);border:2px solid var(--danger)}
+.hist{margin:12px 0 0;padding:12px;border-radius:14px;background:var(--card-soft);font-size:14px;font-weight:700}
+.hist div+div{margin-top:6px}.hist small{color:var(--muted);font-weight:600}
+.toast{position:fixed;left:50%;bottom:calc(86px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--card);padding:10px 16px;border-radius:999px;font-weight:700;font-size:14px;z-index:8;max-width:90%;text-align:center;display:none}
+</style>
+</head>
+<body>
+<div class="cloud c1" aria-hidden="true"></div><div class="cloud c2" aria-hidden="true"></div>
+<div class="wrap" id="app"></div>
+<div class="nav" role="tablist">
+  <button id="n-plan" role="tab">Reja</button><button id="n-pat" role="tab">Bemorlar</button>
+</div>
+
+<div class="scrim" id="s-slot"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sl-title">
+  <h2 id="sl-title"></h2><div class="time" id="sl-time"></div>
+  <label class="l" for="f-name">Bemor ismi</label>
+  <input id="f-name" list="plist" autocomplete="off"><datalist id="plist"></datalist>
+  <div class="hint" id="f-hint"></div>
+  <label class="l" for="f-note">Izoh (ixtiyoriy)</label><input id="f-note" autocomplete="off">
+  <label class="chk" id="f-course-l"><input type="checkbox" id="f-course" checked>10 kunlik kurs (yakshanbasiz)</label>
+  <div class="hint" id="f-end"></div>
+  <div class="row"><button class="btn clear" id="b-clear">Tozalash</button><button class="btn save" id="b-save">Saqlash</button></div>
+</div></div>
+
+<div class="scrim" id="s-pat"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="pt-title">
+  <h2 id="pt-title"></h2>
+  <label class="l" for="p-name">Ism</label><input id="p-name" autocomplete="off">
+  <label class="l" for="p-phone">Ota-ona telefoni</label><input id="p-phone" type="tel" autocomplete="off">
+  <label class="l" for="p-note">Izoh</label><input id="p-note" autocomplete="off">
+  <div class="hist" id="p-hist" style="display:none"></div>
+  <div class="row"><button class="btn del" id="p-del">O’chirish</button><button class="btn save" id="p-save">Saqlash</button></div>
+</div></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+var MONTHS=["yanvar","fevral","mart","aprel","may","iyun","iyul","avgust","sentabr","oktabr","noyabr","dekabr"];
+var DN=["Yakshanba","Dushanba","Seshanba","Chorshanba","Payshanba","Juma","Shanba"],DS=["Ya","Du","Se","Cho","Pa","Ju","Sh"];
+var HOURS=[7,8,9,10,11,13,14,15,16,17,18],KEY="reja-v2",db={patients:[],slots:{}};
+try{var raw=localStorage.getItem(KEY);if(raw)db=JSON.parse(raw)}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}}
+function $(i){return document.getElementById(i)}
+function p(n){return (n<10?"0":"")+n}
+function dk(d){return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())}
+function pd(k){var a=k.split("-");return new Date(+a[0],+a[1]-1,+a[2])}
+function addDays(d,n){var x=new Date(d.getFullYear(),d.getMonth(),d.getDate()+n);return x}
+function fd(d){return d.getDate()+"-"+MONTHS[d.getMonth()]}
+function tm(h){return p(h)+":00–"+p(h)+":50"}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function pat(id){for(var i=0;i<db.patients.length;i++)if(db.patients[i].id===id)return db.patients[i];return null}
+function byName(n){n=n.trim().toLowerCase();for(var i=0;i<db.patients.length;i++)if(db.patients[i].name.toLowerCase()===n)return db.patients[i];return null}
+function toast(m){var t=$("toast");t.textContent=m;t.style.display="block";clearTimeout(toast.h);toast.h=setTimeout(function(){t.style.display="none"},3200)}
+var view="plan",sel=new Date(),editKey=null,editPid=null,delArmed=false,q="";
+function today(){var t=new Date();return new Date(t.getFullYear(),t.getMonth(),t.getDate())}
+sel=today();
+function count(d){var c=0;for(var i=1;i<=11;i++)if(db.slots[dk(d)+"|"+i])c++;return c}
+
+function render(){
+  $("n-plan").setAttribute("aria-selected",view==="plan");$("n-pat").setAttribute("aria-selected",view==="pat");
+  view==="plan"?renderPlan():renderPat();
+}
+function renderPlan(){
+  var dow=(sel.getDay()+6)%7,mon=addDays(sel,-dow),h='';
+  h+='<div class="bar"><button class="ic" id="prev" aria-label="Oldingi hafta">‹</button><h1>'+MONTHS[sel.getMonth()].charAt(0).toUpperCase()+MONTHS[sel.getMonth()].slice(1)+' '+sel.getFullYear()+'</h1><button class="today" id="tdy">Bugun</button><button class="ic" id="next" aria-label="Keyingi hafta">›</button></div><div class="tabs">';
+  for(var i=0;i<7;i++){var d=addDays(mon,i);
+    h+='<button class="tab" data-d="'+dk(d)+'" aria-selected="'+(dk(d)===dk(sel))+'">'+DS[d.getDay()]+'<small>'+(d.getDay()===0?"dam":d.getDate()+" · "+count(d))+'</small></button>'}
+  h+='</div><div class="day-title">'+DN[sel.getDay()]+', '+fd(sel)+(sel.getDay()===0?'':'<span>Band: '+count(sel)+' / 11</span>')+'</div>';
+  if(sel.getDay()===0){h+='<div class="off"><b>Dam olish kuni</b><p>Bugun ish yo’q. Yaxshi dam oling!</p></div>'}
+  else{h+='<div class="list">';
+    for(var n=1;n<=11;n++){
+      if(n===6)h+='<div class="lunch"><span>Tushlik</span><span>12:00–13:00</span></div>';
+      var e=db.slots[dk(sel)+"|"+n],pt=e?pat(e.pid):null;
+      h+='<button class="slot'+(pt?' filled':'')+'" data-n="'+n+'"><span class="num">'+n+'</span><span class="info"><span class="who'+(pt?'':' empty')+'">'+(pt?esc(pt.name):'Bo’sh')+'</span><span class="time">'+tm(HOURS[n-1])+'</span>'+(e&&e.note?'<span class="note">'+esc(e.note)+'</span>':'')+'</span>'+(e&&e.cid?'<span class="badge">'+e.i+'/10</span>':'')+'</button>'}
+    h+='</div>'}
+  $("app").innerHTML=h;
+  $("prev").onclick=function(){sel=addDays(sel,-7);render()};$("next").onclick=function(){sel=addDays(sel,7);render()};
+  $("tdy").onclick=function(){sel=today();render()};
+  document.querySelectorAll(".tab").forEach(function(b){b.onclick=function(){sel=pd(b.getAttribute("data-d"));render()}});
+  document.querySelectorAll(".slot").forEach(function(b){b.onclick=function(){openSlot(+b.getAttribute("data-n"))}});
+}
+function stats(id){var o={total:0,past:0,courses:{}},t=dk(today());
+  for(var k in db.slots){var e=db.slots[k];if(e.pid!==id)continue;var d=k.split("|")[0];o.total++;if(d<=t)o.past++;
+    var c=e.cid||"x"+k;(o.courses[c]=o.courses[c]||{f:d,l:d,n:0,p:0});var z=o.courses[c];if(d<z.f)z.f=d;if(d>z.l)z.l=d;z.n++;if(d<=t)z.p++}
+  return o}
+function renderPat(){
+  var h='<div class="bar"><h1>Bemorlar bazasi</h1></div><button class="add" id="addp">+ Yangi bemor qo’shish</button>';
+  h+='<input class="search" id="q" type="text" placeholder="Ism bo’yicha qidirish" value="'+esc(q)+'">';
+  var L=db.patients.filter(function(x){return x.name.toLowerCase().indexOf(q.toLowerCase())>-1}).sort(function(a,b){return a.name.localeCompare(b.name)});
+  if(!db.patients.length)h+='<div class="emptybox"><b>Baza bo’sh</b><p>Rejaga bemor yozsangiz, u shu yerga avtomatik qo’shiladi.</p></div>';
+  else{h+='<div class="list">';L.forEach(function(x){var s=stats(x.id);
+    h+='<button class="pat" data-id="'+x.id+'"><span class="num">'+esc(x.name.charAt(0).toUpperCase())+'</span><span class="info"><span class="who">'+esc(x.name)+'</span><span class="time">'+(x.phone?esc(x.phone):'Telefon yo’q')+'</span></span><span class="badge">'+s.past+'/'+s.total+'</span></button>'});h+='</div>'}
+  $("app").innerHTML=h;
+  $("addp").onclick=function(){openPat(null)};
+  $("q").oninput=function(){q=this.value;var pos=q.length;renderPat();var el=$("q");el.focus();el.setSelectionRange(pos,pos)};
+  document.querySelectorAll(".pat").forEach(function(b){b.onclick=function(){openPat(b.getAttribute("data-id"))}});
+}
+/* slot sheet */
+function openSlot(n){
+  editKey=dk(sel)+"|"+n;var e=db.slots[editKey],pt=e?pat(e.pid):null;
+  $("sl-title").textContent=n+"-bemor";$("sl-time").textContent=DN[sel.getDay()]+", "+fd(sel)+", "+tm(HOURS[n-1]);
+  $("plist").innerHTML=db.patients.map(function(x){return '<option value="'+esc(x.name)+'">'}).join("");
+  $("f-name").value=pt?pt.name:"";$("f-note").value=e?e.note||"":"";
+  $("f-course").checked=!e;$("f-course-l").style.display=e?"none":"flex";$("b-clear").style.display=e?"block":"none";
+  $("s-slot").classList.add("open");updHint();$("f-name").focus();
+}
+function plan10(start,n,pid){var out=[],d=start,g=0;
+  while(out.length<10&&g<60){var k=dk(d)+"|"+n,ex=db.slots[k];
+    if(d.getDay()!==0&&(!ex||ex.pid===pid))out.push(d);d=addDays(d,1);g++}return out}
+function updHint(){
+  var nm=$("f-name").value.trim(),ex=byName(nm);
+  $("f-hint").textContent=!nm?"":(ex?"Bazadagi bemor tanlandi.":"Yangi bemor bazaga avtomatik qo’shiladi.");
+  var n=+editKey.split("|")[1];
+  if($("f-course").checked&&$("f-course-l").style.display!=="none"){var a=plan10(sel,n,ex?ex.id:null);$("f-end").textContent=a.length?"Kurs "+fd(a[0])+" dan "+fd(a[a.length-1])+" gacha (band kunlar o’tkazib yuboriladi).":""}
+  else $("f-end").textContent="";
+}
+$("f-name").oninput=updHint;$("f-course").onchange=updHint;
+function close(i){$(i).classList.remove("open")}
+$("b-save").onclick=function(){
+  var nm=$("f-name").value.trim(),note=$("f-note").value.trim(),n=+editKey.split("|")[1],e=db.slots[editKey];
+  if(!nm){if(e)delete db.slots[editKey];save();close("s-slot");render();return}
+  var pt=byName(nm),isNew=false;if(!pt){pt={id:uid(),name:nm,phone:"",note:""};db.patients.push(pt);isNew=true}
+  if(e){e.pid=pt.id;e.note=note}
+  else if($("f-course").checked){var cid=uid(),a=plan10(sel,n,pt.id);
+    a.forEach(function(d,i){db.slots[dk(d)+"|"+n]={pid:pt.id,note:note,cid:cid,i:i+1}});
+    toast((isNew?"Bazaga qo’shildi. ":"")+"Kurs: "+fd(a[0])+" – "+fd(a[a.length-1]))}
+  else{db.slots[editKey]={pid:pt.id,note:note};if(isNew)toast("Bemor bazaga qo’shildi")}
+  save();close("s-slot");render()};
+$("b-clear").onclick=function(){delete db.slots[editKey];save();close("s-slot");render()};
+/* patient sheet */
+function openPat(id){
+  editPid=id;delArmed=false;var x=id?pat(id):null;
+  $("pt-title").textContent=x?"Bemor kartasi":"Yangi bemor";
+  $("p-name").value=x?x.name:"";$("p-phone").value=x?x.phone||"":"";$("p-note").value=x?x.note||"":"";
+  $("p-del").style.display=x?"block":"none";$("p-del").textContent="O’chirish";
+  var H=$("p-hist");
+  if(x){var s=stats(id),keys=Object.keys(s.courses).sort(function(a,b){return s.courses[a].f<s.courses[b].f?-1:1});
+    H.style.display="block";
+    H.innerHTML=keys.length?keys.map(function(k){var c=s.courses[k];return '<div>'+fd(pd(c.f))+(c.f!==c.l?' – '+fd(pd(c.l)):'')+'<br><small>'+c.p+' / '+c.n+' seans o’tgan</small></div>'}).join(""):'<small>Hali rejaga yozilmagan</small>'}
+  else H.style.display="none";
+  $("s-pat").classList.add("open");$("p-name").focus();
+}
+$("p-save").onclick=function(){
+  var nm=$("p-name").value.trim();if(!nm){$("p-name").focus();return}
+  var x=editPid?pat(editPid):null;
+  if(x){x.name=nm;x.phone=$("p-phone").value.trim();x.note=$("p-note").value.trim()}
+  else db.patients.push({id:uid(),name:nm,phone:$("p-phone").value.trim(),note:$("p-note").value.trim()});
+  save();close("s-pat");render()};
+$("p-del").onclick=function(){
+  if(!delArmed){delArmed=true;this.textContent="Aniq o’chirilsinmi?";return}
+  db.patients=db.patients.filter(function(x){return x.id!==editPid});
+  for(var k in db.slots)if(db.slots[k].pid===editPid)delete db.slots[k];
+  save();close("s-pat");render()};
+["s-slot","s-pat"].forEach(function(i){$(i).onclick=function(e){if(e.target===this)close(i)}});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"){close("s-slot");close("s-pat")}});
+$("n-plan").onclick=function(){view="plan";render()};$("n-pat").onclick=function(){view="pat";render()};
+try{var tg=window.Telegram&&Telegram.WebApp;if(tg){tg.ready();tg.expand();if(tg.disableVerticalSwipes)tg.disableVerticalSwipes();
+document.documentElement.setAttribute("data-theme",tg.colorScheme==="dark"?"dark":"light");
+try{tg.setHeaderColor(tg.colorScheme==="dark"?"#16314d":"#e4f4ff")}catch(e){}}}catch(e){}
+render();
+</script>
+</body>
+</html>
